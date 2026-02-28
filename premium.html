@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>برنامج المشاريع - نسخة احترافية</title>
+
+<style>
+:root{
+  --bg1:#0b1020;
+  --bg2:#141b3a;
+  --card:rgba(255,255,255,0.06);
+  --glass:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.15);
+  --blue:#5f8cff;
+  --green:#2ecc71;
+  --red:#ff4d4d;
+}
+
+body{
+  margin:0;
+  font-family:system-ui;
+  background:
+  radial-gradient(circle at 20% 20%, #273c75 0%, transparent 40%),
+  radial-gradient(circle at 80% 0%, #5f27cd 0%, transparent 40%),
+  linear-gradient(160deg,var(--bg1),var(--bg2));
+  color:white;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:30px;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+}
+
+.title{
+  font-size:28px;
+  font-weight:bold;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:30px;
+}
+
+.stat{
+  background:var(--glass);
+  border:1px solid var(--border);
+  backdrop-filter:blur(15px);
+  padding:20px;
+  border-radius:20px;
+}
+
+.stat h2{
+  margin:0;
+  font-size:28px;
+}
+
+.tabs{
+  display:flex;
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.tab{
+  padding:8px 18px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  cursor:pointer;
+}
+
+.tab.active{
+  background:linear-gradient(45deg,#5f8cff,#8e44ad);
+}
+
+.project{
+  background:var(--card);
+  backdrop-filter:blur(18px);
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:25px;
+  margin-bottom:25px;
+}
+
+.project-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.badge{
+  padding:6px 15px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.unpaid{
+  background:#ff4d4d33;
+  color:var(--red);
+}
+
+.paid{
+  background:#2ecc7133;
+  color:var(--green);
+}
+
+.service{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.total{
+  font-size:18px;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.summary{
+  margin-top:40px;
+  padding:20px;
+  border-radius:25px;
+  background:linear-gradient(45deg,#1f2a4d,#2a1f4d);
+  text-align:center;
+  font-size:22px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="title">برنامج المشاريع</div>
+  <div>Waleed</div>
+</header>
+
+<div class="stats">
+  <div class="stat">
+    <small>عدد المشاريع</small>
+    <h2>3</h2>
+  </div>
+  <div class="stat">
+    <small>غير مستلم</small>
+    <h2 style="color:#ff4d4d">2</h2>
+  </div>
+  <div class="stat">
+    <small>مستلم</small>
+    <h2 style="color:#2ecc71">1</h2>
+  </div>
+  <div class="stat">
+    <small>إجمالي الأرباح</small>
+    <h2>5,700 د.ك</h2>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active">غير مستلم</div>
+  <div class="tab">مستلم</div>
+</div>
+
+<div class="project">
+  <div class="project-header">
+    <div>
+      <strong>اسم العمل X</strong><br>
+      <small>أغنية سنقل</small>
+    </div>
+    <div class="badge unpaid">غير مستلم</div>
+  </div>
+
+  <div class="service">
+    <span>كتابة كلمات</span>
+    <span>500 د.ك</span>
+  </div>
+  <div class="service">
+    <span>ألحان</span>
+    <span>800 د.ك</span>
+  </div>
+  <div class="service">
+    <span>توزيع موسيقي</span>
+    <span>1,500 د.ك</span>
+  </div>
+
+  <div class="total">الإجمالي: 2,800 د.ك</div>
+</div>
+
+<div class="summary">
+المجموع الذي لم يوصلني: <strong>3,500 د.ك</strong>
+</div>
+
+</div>
+</body>
+</html>
