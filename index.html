@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>برنامج المشاريع — حسابات متعددة (نهائي)</title>
+<style>
+  :root{
+    --bg1:#070b14; --bg2:#0a1224;
+    --glass: rgba(255,255,255,.08);
+    --border: rgba(255,255,255,.14);
+    --txt:#eaf1ff; --muted:#a9b8d8;
+    --blue:#5f8cff; --purple:#8e44ad;
+    --ok:#2ecc71; --danger:#ff4d4d;
+    --shadow: 0 22px 70px rgba(0,0,0,.48);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Tahoma, Arial;
+    color:var(--txt);
+    background:
+      radial-gradient(1000px 700px at 20% 20%, rgba(95,140,255,.22), transparent 55%),
+      radial-gradient(900px 650px at 85% 0%, rgba(142,68,173,.20), transparent 55%),
+      linear-gradient(160deg,var(--bg1),var(--bg2));
+    min-height:100vh;
+  }
+  .container{max-width:1100px;margin:auto;padding:22px;}
+  header{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:12px;flex-wrap:wrap;margin:8px 0 18px;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:46px;height:46px;border-radius:16px;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    box-shadow:0 14px 40px rgba(95,140,255,.25);
+    position:relative;
+  }
+  .logo:after{
+    content:"";position:absolute;inset:10px;border-radius:12px;
+    background:rgba(10,18,36,.35);border:1px solid rgba(255,255,255,.18);
+  }
+  .brand h1{margin:0;font-size:22px;font-weight:950}
+  .brand .sub{margin-top:2px;color:var(--muted);font-size:12px}
+
+  .topActions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .pill{
+    padding:7px 10px;border-radius:999px;border:1px solid var(--border);
+    background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;
+    backdrop-filter: blur(12px);
+  }
+  button{
+    cursor:pointer;border:none;border-radius:14px;padding:10px 12px;
+    font-weight:950;user-select:none;transition:.15s transform;
+  }
+  button:active{transform:scale(.98)}
+  .btnPrimary{
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    color:#091024;box-shadow:0 14px 40px rgba(95,140,255,.18);
+  }
+  .btnGhost{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14);
+    color:var(--txt);
+  }
+  .btnOk{ background: rgba(46,204,113,.16); border:1px solid rgba(46,204,113,.35); color:var(--ok); }
+  .btnDanger{ background: rgba(255,77,77,.14); border:1px solid rgba(255,77,77,.30); color:var(--danger); }
+
+  .card{
+    background:var(--glass);
+    border:1px solid var(--border);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    backdrop-filter: blur(16px);
+    padding:18px;
+  }
+  .hint{margin:0 0 12px;color:var(--muted);font-size:12.5px;line-height:1.65}
+  .page{display:none}
+  .page.active{display:block}
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:14px;margin-bottom:16px;
+  }
+  @media(max-width:1050px){.stats{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:22px;
+    padding:14px;
+  }
+  .stat .k{color:var(--muted);font-size:12px}
+  .stat .v{margin-top:8px;font-size:22px;font-weight:950}
+  .stat .v.red{color:var(--danger)}
+  .stat .v.green{color:var(--ok)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:980px){.grid2{grid-template-columns:1fr}}
+  label{display:block;margin:10px 0 6px;color:var(--muted);font-size:12.5px}
+  input,select{
+    width:100%;padding:12px 12px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(10,18,36,.7);
+    color:var(--txt);outline:none;
+  }
+  input:focus,select:focus{
+    border-color:rgba(95,140,255,.8);
+    box-shadow:0 0 0 3px rgba(95,140,255,.18);
+  }
+  .svcRow{
+    display:grid;
+    grid-template-columns: 170px 1fr 170px;
+    gap:10px;align-items:center;margin:10px 0;
+  }
+  @media(max-width:820px){.svcRow{grid-template-columns:1fr}}
+
+  .totalBox{
+    margin-top:12px;padding:12px;border-radius:18px;
+    border:1px dashed rgba(255,255,255,.22);
+    background:rgba(255,255,255,.03);
+    display:flex;justify-content:space-between;align-items:center;
+    gap:10px;flex-wrap:wrap;
+  }
+  .totalBox strong{font-size:24px;font-weight:950}
+
+  .dashGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+  @media(max-width:980px){.dashGrid{grid-template-columns:1fr}}
+  .dashCard{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:24px;
+    padding:16px;
+    cursor:pointer;
+    transition:.15s transform,.15s border-color;
+  }
+  .dashCard:hover{transform:translateY(-2px);border-color:rgba(95,140,255,.45)}
+  .dashCard .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .dashCard .name{font-weight:950;font-size:15px}
+  .dashCard .count{font-weight:950;font-size:22px}
+  .dashCard .desc{margin-top:8px;color:var(--muted);font-size:12.5px;line-height:1.6}
+  .chip{
+    padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.05);font-size:12px;color:var(--muted);
+  }
+
+  .viewHeader{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    gap:12px;flex-wrap:wrap;margin-bottom:10px;
+  }
+  .viewTitle{margin:0;font-size:16px;font-weight:950}
+  .viewMeta{color:var(--muted);font-size:12.5px;margin-top:6px}
+
+  .list{display:grid;gap:14px}
+  .item{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:26px;overflow:hidden;
+  }
+  .itemHead{
+    padding:16px;display:flex;justify-content:space-between;align-items:center;
+    gap:10px;flex-wrap:wrap;
+  }
+  .title{font-weight:950;font-size:16px}
+  .meta{margin-top:6px;color:var(--muted);font-size:12.5px}
+  .badge{
+    padding:7px 14px;border-radius:999px;border:1px solid;
+    font-size:12px;font-weight:950;white-space:nowrap;
+  }
+  .badge.red{color:var(--danger);background:rgba(255,77,77,.14);border-color:rgba(255,77,77,.30)}
+  .badge.green{color:var(--ok);background:rgba(46,204,113,.14);border-color:rgba(46,204,113,.30)}
+
+  .itemBody{padding:16px;border-top:1px solid rgba(255,255,255,.08)}
+  .kvGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:560px){.kvGrid{grid-template-columns:1fr}}
+  .kv{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:10px 12px;border-radius:16px;background:rgba(0,0,0,.18);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .kv .k{color:var(--muted);font-size:12.5px}
+  .kv .v{font-weight:950}
+  .k small{opacity:.75}
+
+  .rowBtns{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+
+  .sumBar{
+    margin-top:14px;padding:14px 16px;border-radius:26px;
+    background:linear-gradient(135deg, rgba(31,42,77,.85), rgba(42,31,77,.85));
+    border:1px solid rgba(255,255,255,.12);
+    display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .sumBar .k{color:var(--muted);font-size:12.5px}
+  .sumBar .v{font-size:26px;font-weight:950}
+
+  .empty{
+    margin-top:12px;text-align:center;color:var(--muted);
+    padding:18px;border-radius:22px;
+    border:1px dashed rgba(255,255,255,.18);
+    background:rgba(255,255,255,.03);
+  }
+
+  .toast{
+    position:fixed;left:16px;right:16px;bottom:16px;max-width:900px;margin:0 auto;
+    padding:12px 14px;border-radius:18px;background:rgba(255,77,77,.14);
+    border:1px solid rgba(255,77,77,.35);backdrop-filter: blur(10px);
+    display:none;z-index:9999;
+  }
+  footer{margin-top:16px;text-align:center;color:rgba(255,255,255,.35);font-size:12px}
+</style>
+</head>
+
+<body>
+<div class="toast" id="toastErr"></div>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>برنامج المشاريع</h1>
+        <div class="sub">كل حساب له مشاريعه — عند الخروج تختفي البيانات</div>
+      </div>
+    </div>
+    <div class="topActions">
+      <span class="pill" id="whoPill">غير مسجل</span>
+      <button class="btnGhost" id="navLogin" type="button">تسجيل</button>
+      <button class="btnGhost" id="navDashboard" type="button">الرئيسية</button>
+      <button class="btnGhost" id="navNew" type="button">مشروع جديد</button>
+      <button class="btnDanger" id="btnResetUser" type="button">Reset</button>
+      <button class="btnGhost" id="btnLogout" type="button">خروج</button>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stat"><div class="k">عدد المشاريع</div><div class="v" id="sTotal">0</div></div>
+    <div class="stat"><div class="k">غير مستلم</div><div class="v red" id="sUnpaid">0</div></div>
+    <div class="stat"><div class="k">مستلم</div><div class="v green" id="sPaid">0</div></div>
+    <div class="stat"><div class="k">إجمالي محقق</div><div class="v" id="sRealized">0</div></div>
+    <div class="stat"><div class="k">صافي الربح (وليد)</div><div class="v" id="sNet">0</div></div>
+  </section>
+
+  <!-- LOGIN -->
+  <section class="page card active" id="pageLogin">
+    <h2>إنشاء حساب / تسجيل دخول</h2>
+    <p class="hint">إذا كانت عندك نسخة قديمة، النظام يصلّح التخزين تلقائيًا.</p>
+
+    <div class="grid2">
+      <div class="card" style="box-shadow:none">
+        <h2>إنشاء حساب</h2>
+        <label>الاسم</label>
+        <input id="suName" placeholder="مثال: waleed">
+        <label>PIN (6 أرقام)</label>
+        <input id="suPin" inputmode="numeric" maxlength="6" placeholder="123456">
+        <button class="btnPrimary" id="btnSignup" type="button">إنشاء</button>
+        <div class="hint" id="msgSignup"></div>
+      </div>
+
+      <div class="card" style="box-shadow:none">
+        <h2>تسجيل دخول</h2>
+        <label>الاسم</label>
+        <input id="liName" placeholder="اسم الحساب">
+        <label>PIN (6 أرقام)</label>
+        <input id="liPin" inputmode="numeric" maxlength="6" placeholder="123456">
+        <button class="btnPrimary" id="btnLogin" type="button">دخول</button>
+        <div class="hint" id="msgLogin"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="page card" id="pageDashboard">
+    <h2>الرئيسية</h2>
+    <p class="hint">اضغط بطاقة للدخول للقائمة وتشوف التفاصيل + التاريخ.</p>
+
+    <div class="dashGrid">
+      <div class="dashCard" id="goUnpaid">
+        <div class="top"><div class="name">غير مستلم</div><div class="chip">قائمة</div></div>
+        <div class="count" id="cardUnpaid">0</div>
+        <div class="desc">مشاريع لم يتم استلامها.</div>
+      </div>
+
+      <div class="dashCard" id="goPaid">
+        <div class="top"><div class="name">مستلم</div><div class="chip">قائمة</div></div>
+        <div class="count" id="cardPaid">0</div>
+        <div class="desc">مشاريع تم استلامها (محققة).</div>
+      </div>
+
+      <div class="dashCard" id="goNet">
+        <div class="top"><div class="name">صافي الربح (وليد)</div><div class="chip">تفاصيل</div></div>
+        <div class="count" id="cardNet">0</div>
+        <div class="desc">بنود وليد سلطان فقط.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW PROJECT -->
+  <section class="page card" id="pageNew">
+    <h2>مشروع جديد</h2>
+    <p class="hint">اختر “وليد سلطان” للبنود اللي تدخل صافي الربح.</p>
+
+    <div class="grid2">
+      <div class="card" style="box-shadow:none">
+        <h2>بيانات المشروع</h2>
+        <label>اسم العمل</label>
+        <input id="projectName" placeholder="مثال: أغنية / إعلان">
+        <label>نوع العمل</label>
+        <input id="workType" placeholder="مثال: سنقل / إعلان">
+        <div class="hint" id="msgNewLeft"></div>
+      </div>
+
+      <div class="card" style="box-shadow:none">
+        <h2>الخدمات (10)</h2>
+        <div id="svcWrap"></div>
+
+        <div class="totalBox">
+          <div>
+            <div class="hint" style="margin:0">إجمالي المشروع</div>
+            <strong id="total">0 د.ك</strong>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btnGhost" id="btnCalc" type="button">احسب</button>
+            <button class="btnPrimary" id="btnSave" type="button">حفظ</button>
+          </div>
+        </div>
+        <div class="hint" id="msgNew"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIST VIEW -->
+  <section class="page card" id="pageList">
+    <div class="viewHeader">
+      <div>
+        <h2 class="viewTitle" id="viewTitle">قائمة</h2>
+        <div class="viewMeta" id="viewMeta">—</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btnGhost" id="backDash" type="button">رجوع</button>
+      </div>
+    </div>
+
+    <div class="list" id="list"></div>
+    <div class="empty" id="empty" style="display:none">ماكو بيانات في هذي القائمة.</div>
+
+    <div class="sumBar" id="sumBar" style="display:none">
+      <div class="k" id="sumLabel">المجموع</div>
+      <div class="v" id="sumValue">0 د.ك</div>
+    </div>
+  </section>
+
+  <footer>نسخة نهائية — ملف واحد</footer>
+</div>
+
+<script>
+/* =========================
+   Robust Core (NO NULL USERS)
+========================= */
+
+function toastError(text){
+  const t = document.getElementById("toastErr");
+  t.textContent = "خطأ: " + text;
+  t.style.display = "block";
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=> t.style.display="none", 6500);
+}
+window.addEventListener("error", (e)=> toastError(e.message || "Unknown error"));
+window.addEventListener("unhandledrejection", (e)=> toastError(e.reason?.message || String(e.reason || "Promise error")));
+
+const $ = (id)=>document.getElementById(id);
+const pages=["pageLogin","pageDashboard","pageNew","pageList"];
+
+function showPage(id){ pages.forEach(p=>$(p).classList.toggle("active", p===id)); }
+
+function safeParse(v, fb){
+  try{ return JSON.parse(v); }catch{ return fb; }
+}
+function saveJson(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function loadJson(k,fb){ return safeParse(localStorage.getItem(k), fb); }
+
+function isSix(pin){ return /^[0-9]{6}$/.test(pin); }
+function normalizeName(name){ return (name||"").trim().toLowerCase(); }
+
+function num(v){
+  const s=String(v??"").replace(/,/g,"").trim();
+  if(!s) return 0;
+  const n=Number(s);
+  return Number.isFinite(n)?n:0;
+}
+function fmt(n){
+  const x=Number(n||0);
+  const out=(Number.isFinite(x)?x:0).toFixed(2);
+  return out.replace(/\.00$/,'');
+}
+function esc(s){
+  return String(s??"").replace(/[&<>"']/g, c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function fmtDate(iso){
+  if(!iso) return "—";
+  const d=new Date(iso);
+  return d.toLocaleString("ar-KW",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+}
+function newId(){ return String(Date.now())+"_"+Math.random().toString(16).slice(2); }
+
+/* =========================
+   Multi-User Storage Keys
+========================= */
+const LS_USERS="pm_users_v2";
+const LS_SESSION="pm_session_v2";
+const PROJECTS_PREFIX="pm_projects_v2_";
+
+/* ===== Migration/Repair (in case old broken values exist) ===== */
+function repairUsersStorage(){
+  const raw = localStorage.getItem(LS_USERS);
+  if(raw === null) return; // ok, empty
+  const val = safeParse(raw, null);
+  // If not array => reset to []
+  if(!Array.isArray(val)){
+    saveJson(LS_USERS, []);
+  }
+}
+repairUsersStorage();
+
+function loadUsers(){
+  const data = loadJson(LS_USERS, []);
+  const arr = Array.isArray(data) ? data : [];
+  // Self-heal if corrupted
+  if(!Array.isArray(data)) saveJson(LS_USERS, arr);
+  return arr;
+}
+function saveUsers(arr){
+  const safe = Array.isArray(arr) ? arr : [];
+  saveJson(LS_USERS, safe);
+}
+
+function getSession(){ return loadJson(LS_SESSION, null); }
+function setSession(userId){ saveJson(LS_SESSION, {userId}); }
+function clearSession(){ localStorage.removeItem(LS_SESSION); }
+
+function getCurrentUser(){
+  const s=getSession();
+  if(!s || !s.userId) return null;
+  const users=loadUsers();
+  return users.find(u=>u.id===s.userId) || null;
+}
+function isLoggedIn(){ return !!getCurrentUser(); }
+
+function projectsKey(){
+  const u=getCurrentUser();
+  return u ? (PROJECTS_PREFIX + u.id) : null;
+}
+
+function loadProjects(){
+  const key=projectsKey();
+  if(!key) return [];
+  const raw=localStorage.getItem(key);
+  if(!raw) return [];
+  const data=safeParse(raw, []);
+  const arr = Array.isArray(data) ? data : [];
+  if(!Array.isArray(data)) localStorage.setItem(key, JSON.stringify(arr)); // self-heal
+  return arr;
+}
+function saveProjects(arr){
+  const key=projectsKey();
+  if(!key) return;
+  const safe = Array.isArray(arr) ? arr : [];
+  localStorage.setItem(key, JSON.stringify(safe));
+}
+
+function requireLogin(){
+  if(!isLoggedIn()){
+    lockUI();
+    showPage("pageLogin");
+    return false;
+  }
+  return true;
+}
+
+/* =========================
+   UI Lock/Unlock (Hide data)
+========================= */
+function setStatsZero(){
+  $("sTotal").textContent="0";
+  $("sUnpaid").textContent="0";
+  $("sPaid").textContent="0";
+  $("sRealized").textContent="0";
+  $("sNet").textContent="0";
+  $("cardUnpaid").textContent="0";
+  $("cardPaid").textContent="0";
+  $("cardNet").textContent="0";
+}
+function clearListUI(){
+  $("list").innerHTML="";
+  $("empty").style.display="none";
+  $("sumBar").style.display="none";
+  $("sumValue").textContent="0 د.ك";
+  $("viewTitle").textContent="قائمة";
+  $("viewMeta").textContent="—";
+}
+function lockUI(){
+  $("whoPill").textContent="غير مسجل";
+  $("btnLogout").style.display="none";
+  setStatsZero();
+  clearListUI();
+}
+function unlockUI(){
+  const u=getCurrentUser();
+  $("whoPill").textContent = u ? `مسجل: ${u.name}` : "غير مسجل";
+  $("btnLogout").style.display="inline-flex";
+  updateStats();
+}
+
+/* =========================
+   Stats per current user
+========================= */
+function calcNet(all){
+  let net=0;
+  all.forEach(p=>{
+    (p.services||[]).forEach(s=>{ if(s.owner==="waleed") net += num(s.amount); });
+  });
+  return net;
+}
+function calcRealized(all){
+  return all.reduce((a,p)=> a + (p.paid?num(p.total):0), 0);
+}
+function updateStats(){
+  if(!isLoggedIn()){ lockUI(); return; }
+  const all=loadProjects();
+  const total=all.length;
+  const paid=all.filter(p=>p.paid).length;
+  const unpaid=total-paid;
+  const realized=calcRealized(all);
+  const net=calcNet(all);
+
+  $("sTotal").textContent=String(total);
+  $("sPaid").textContent=String(paid);
+  $("sUnpaid").textContent=String(unpaid);
+  $("sRealized").textContent=fmt(realized)+" د.ك";
+  $("sNet").textContent=fmt(net)+" د.ك";
+
+  $("cardUnpaid").textContent=String(unpaid);
+  $("cardPaid").textContent=String(paid);
+
+  let netCount=0;
+  all.forEach(p=>{
+    (p.services||[]).forEach(s=>{ if(s.owner==="waleed" && num(s.amount)>0) netCount++; });
+  });
+  $("cardNet").textContent=String(netCount);
+}
+
+/* =========================
+   Services inputs
+========================= */
+function buildServices(){
+  const wrap=$("svcWrap");
+  wrap.innerHTML="";
+  for(let i=1;i<=10;i++){
+    const row=document.createElement("div");
+    row.className="svcRow";
+    row.innerHTML=`
+      <select class="svcOwner">
+        <option value="">غير ذلك</option>
+        <option value="waleed">وليد سلطان</option>
+      </select>
+      <input class="svcName" placeholder="اسم الخدمة ${i}">
+      <input class="svcAmt" placeholder="المبلغ" inputmode="decimal">
+    `;
+    wrap.appendChild(row);
+  }
+  wrap.querySelectorAll(".svcAmt").forEach(inp=>inp.addEventListener("input", calcTotal));
+}
+function getServices(){
+  const owners=[...document.querySelectorAll(".svcOwner")];
+  const names=[...document.querySelectorAll(".svcName")];
+  const amts=[...document.querySelectorAll(".svcAmt")];
+  const out=[];
+  for(let i=0;i<10;i++){
+    const owner=owners[i].value||"";
+    const name=(names[i].value||"").trim();
+    const amount=num(amts[i].value);
+    if(owner || name || amount){
+      out.push({owner, name: name||`خدمة ${i+1}`, amount});
+    }
+  }
+  return out;
+}
+function calcTotal(){
+  const total=getServices().reduce((a,s)=>a+num(s.amount),0);
+  $("total").textContent=fmt(total)+" د.ك";
+  return total;
+}
+function resetNew(){
+  $("projectName").value="";
+  $("workType").value="";
+  document.querySelectorAll(".svcOwner").forEach(i=>i.value="");
+  document.querySelectorAll(".svcName").forEach(i=>i.value="");
+  document.querySelectorAll(".svcAmt").forEach(i=>i.value="");
+  $("total").textContent="0 د.ك";
+  $("msgNewLeft").textContent="";
+  $("msgNew").textContent="";
+}
+function saveProject(){
+  if(!requireLogin()) return;
+
+  const projectName=$("projectName").value.trim();
+  const workType=$("workType").value.trim();
+  const services=getServices();
+
+  if(!projectName){ $("msgNewLeft").textContent="اكتب اسم العمل."; return; }
+  if(!workType){ $("msgNewLeft").textContent="اكتب نوع العمل."; return; }
+  if(services.length===0){ $("msgNew").textContent="عبي خدمة وحدة على الأقل."; return; }
+
+  const total=services.reduce((a,s)=>a+num(s.amount),0);
+  const now=new Date().toISOString();
+
+  const all=loadProjects();
+  all.unshift({
+    id:newId(),
+    createdAt: now,
+    projectName,
+    workType,
+    services,
+    total,
+    paid:false
+  });
+  saveProjects(all);
+  updateStats();
+  resetNew();
+  showPage("pageDashboard");
+}
+
+/* =========================
+   List view (drill-down)
+========================= */
+let currentView="unpaid"; // unpaid | paid | net
+
+function openList(view){
+  if(!requireLogin()) return;
+  currentView=view;
+  renderList();
+  showPage("pageList");
+}
+
+function renderProjectCard(p){
+  const badgeClass = p.paid ? "green" : "red";
+  const badgeText  = p.paid ? "مستلم" : "غير مستلم";
+
+  const servicesHtml=(p.services||[]).map(s=>`
+    <div class="kv">
+      <div class="k">${esc(s.name)} ${s.owner==="waleed"?`<small>• وليد سلطان</small>`:""}</div>
+      <div class="v">${fmt(s.amount)} د.ك</div>
+    </div>
+  `).join("");
+
+  const item=document.createElement("div");
+  item.className="item";
+  item.innerHTML=`
+    <div class="itemHead">
+      <div>
+        <div class="title">${esc(p.projectName)} <span style="opacity:.6">—</span>
+          <span style="color:var(--muted)">${esc(p.workType)}</span>
+        </div>
+        <div class="meta">تاريخ: ${fmtDate(p.createdAt)}</div>
+      </div>
+      <div class="badge ${badgeClass}">${badgeText}</div>
+    </div>
+    <div class="itemBody">
+      <div class="kvGrid">
+        ${servicesHtml}
+        <div class="kv"><div class="k">الإجمالي</div><div class="v">${fmt(p.total)} د.ك</div></div>
+      </div>
+      <div class="rowBtns">
+        <button class="${p.paid ? "btnDanger" : "btnOk"}" data-action="toggle" data-id="${p.id}">
+          ${p.paid ? "رجّعه غير مستلم" : "تم الاستلام"}
+        </button>
+        <button class="btnGhost" data-action="delete" data-id="${p.id}">حذف</button>
+      </div>
+    </div>
+  `;
+  return item;
+}
+
+function renderList(){
+  if(!requireLogin()) return;
+
+  const all=loadProjects();
+  const list=$("list");
+  list.innerHTML="";
+  let sum=0;
+
+  if(currentView==="unpaid"){
+    const items=all.filter(p=>!p.paid);
+    $("viewTitle").textContent="غير مستلم";
+    $("viewMeta").textContent=`عدد المشاريع: ${items.length}`;
+    items.forEach(p=>{ sum+=num(p.total); list.appendChild(renderProjectCard(p)); });
+    $("sumLabel").textContent="مجموع غير المستلم";
+    $("empty").style.display=items.length?"none":"block";
+  }
+
+  if(currentView==="paid"){
+    const items=all.filter(p=>p.paid);
+    $("viewTitle").textContent="مستلم";
+    $("viewMeta").textContent=`عدد المشاريع: ${items.length}`;
+    items.forEach(p=>{ sum+=num(p.total); list.appendChild(renderProjectCard(p)); });
+    $("sumLabel").textContent="مجموع المستلم";
+    $("empty").style.display=items.length?"none":"block";
+  }
+
+  if(currentView==="net"){
+    $("viewTitle").textContent="صافي الربح (وليد سلطان)";
+    const rows=[];
+    all.forEach(p=>{
+      const waleed=(p.services||[]).filter(s=>s.owner==="waleed" && num(s.amount)>0);
+      if(waleed.length) rows.push({p, waleed});
+    });
+
+    $("viewMeta").textContent=`عدد المشاريع التي تحتوي بنود وليد: ${rows.length}`;
+
+    rows.forEach(r=>{
+      const p=r.p;
+      const badge = p.paid ? `<div class="badge green">مستلم</div>` : `<div class="badge red">غير مستلم</div>`;
+      const servicesHtml=r.waleed.map(s=>{
+        sum+=num(s.amount);
+        return `
+          <div class="kv">
+            <div class="k">${esc(s.name)} <small>• وليد سلطان</small></div>
+            <div class="v">${fmt(s.amount)} د.ك</div>
+          </div>
+        `;
+      }).join("");
+
+      const wrap=document.createElement("div");
+      wrap.className="item";
+      wrap.innerHTML=`
+        <div class="itemHead">
+          <div>
+            <div class="title">${esc(p.projectName)} <span style="opacity:.6">—</span>
+              <span style="color:var(--muted)">${esc(p.workType)}</span>
+            </div>
+            <div class="meta">تاريخ: ${fmtDate(p.createdAt)}</div>
+          </div>
+          ${badge}
+        </div>
+        <div class="itemBody">
+          <div class="kvGrid">${servicesHtml}</div>
+        </div>
+      `;
+      list.appendChild(wrap);
+    });
+
+    $("sumLabel").textContent="صافي الربح (وليد)";
+    $("empty").style.display=rows.length?"none":"block";
+  }
+
+  $("sumBar").style.display="flex";
+  $("sumValue").textContent=fmt(sum)+" د.ك";
+  updateStats();
+}
+
+function togglePaid(id){
+  if(!requireLogin()) return;
+  const all=loadProjects();
+  const idx=all.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  all[idx].paid=!all[idx].paid;
+  saveProjects(all);
+  renderList();
+}
+
+function deleteProject(id){
+  if(!requireLogin()) return;
+  const all=loadProjects();
+  const idx=all.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  if(!confirm("أكيد تبي حذف المشروع؟")) return;
+  all.splice(idx,1);
+  saveProjects(all);
+  renderList();
+}
+
+/* =========================
+   Auth (Multi users) - FIXED
+========================= */
+function signup(){
+  const name=$("suName").value.trim();
+  const pin=$("suPin").value.trim();
+  $("msgSignup").textContent="";
+
+  if(!name){ $("msgSignup").textContent="اكتب الاسم."; return; }
+  if(!isSix(pin)){ $("msgSignup").textContent="PIN لازم 6 أرقام."; return; }
+
+  const users = loadUsers(); // always array
+  const norm = normalizeName(name);
+
+  const exists = users.find(u=>u.norm===norm);
+  if(exists){
+    $("msgSignup").textContent="هذا الاسم موجود. استخدم تسجيل الدخول.";
+    return;
+  }
+
+  const user = { id:newId(), name, norm, pin };
+  users.push(user);
+  saveUsers(users);
+
+  setSession(user.id);
+  unlockUI();
+  showPage("pageDashboard");
+  $("msgSignup").textContent="تم إنشاء الحساب ✅";
+}
+
+function login(){
+  const name=$("liName").value.trim();
+  const pin=$("liPin").value.trim();
+  $("msgLogin").textContent="";
+
+  if(!name){ $("msgLogin").textContent="اكتب الاسم."; return; }
+  if(!isSix(pin)){ $("msgLogin").textContent="PIN لازم 6 أرقام."; return; }
+
+  const users = loadUsers(); // always array
+  const norm = normalizeName(name);
+  const user = users.find(u=>u.norm===norm);
+
+  if(!user){ $("msgLogin").textContent="الحساب غير موجود. سوّ إنشاء."; return; }
+  if(user.pin !== pin){ $("msgLogin").textContent="PIN غلط."; return; }
+
+  setSession(user.id);
+  unlockUI();
+  showPage("pageDashboard");
+  $("msgLogin").textContent="تم تسجيل الدخول ✅";
+}
+
+function logout(){
+  clearSession();
+  lockUI();            // hide everything
+  showPage("pageLogin");
+}
+
+/* =========================
+   Reset current user projects
+========================= */
+function resetCurrentUserProjects(){
+  const u = getCurrentUser();
+  if(!u){
+    alert("سجّل دخول أولاً.");
+    return;
+  }
+  const pin = prompt("اكتب PIN لتأكيد حذف مشاريع هذا الحساب:");
+  if(pin === null) return;
+  if(pin.trim() !== u.pin){
+    alert("PIN غلط.");
+    return;
+  }
+  if(!confirm("أكيد تبي حذف كل مشاريع هذا الحساب؟")) return;
+
+  localStorage.removeItem(PROJECTS_PREFIX + u.id);
+  clearListUI();
+  updateStats();
+  showPage("pageDashboard");
+  alert("تم حذف مشاريع الحساب ✅");
+}
+
+/* =========================
+   Events
+========================= */
+$("navLogin").addEventListener("click", ()=> showPage("pageLogin"));
+$("navDashboard").addEventListener("click", ()=> { if(requireLogin()) showPage("pageDashboard"); });
+$("navNew").addEventListener("click", ()=> { if(requireLogin()) showPage("pageNew"); });
+
+$("goUnpaid").addEventListener("click", ()=> openList("unpaid"));
+$("goPaid").addEventListener("click", ()=> openList("paid"));
+$("goNet").addEventListener("click", ()=> openList("net"));
+$("backDash").addEventListener("click", ()=> showPage("pageDashboard"));
+
+$("btnCalc").addEventListener("click", ()=> calcTotal());
+$("btnSave").addEventListener("click", ()=> saveProject());
+
+document.addEventListener("click",(e)=>{
+  const b=e.target.closest("button[data-action]");
+  if(!b) return;
+  const action=b.dataset.action;
+  const id=b.dataset.id;
+  if(action==="toggle") togglePaid(id);
+  if(action==="delete") deleteProject(id);
+});
+
+$("btnSignup").addEventListener("click", signup);
+$("btnLogin").addEventListener("click", login);
+$("btnLogout").addEventListener("click", logout);
+$("btnResetUser").addEventListener("click", resetCurrentUserProjects);
+
+/* =========================
+   Init
+========================= */
+function init(){
+  buildServices();
+  if(isLoggedIn()){
+    unlockUI();
+    showPage("pageDashboard");
+  }else{
+    lockUI();
+    showPage("pageLogin");
+  }
+}
+init();
+</script>
+</body>
+</html>
